@@ -1,136 +1,216 @@
-import React, { useState } from 'react';
-import { supabase } from '../services/supabase';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "../services/supabase";
 
-const Signup = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    cnic: '',
-    rollNo: '',
-    name: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+export default function SignupPage() {
   const navigate = useNavigate();
-
- const handleSignup = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-
-  // 1. Check if student exists in our "authorized" list
-  const { data: isAuthorized, error: authCheckError } = await supabase
-    .from('authStudents') // Agar quotes se error aaye toh sirf 'authStudents' likho
-    .select('*')
-    .eq('cnic', formData.cnic)
-    .eq('rollNo', formData.rollNo)
-    .single();
-
-  if (authCheckError || !isAuthorized) {
-    alert("Record not found! Table mein data check karein.");
-    setLoading(false);
-    return;
-  }
-
-  // 2. Agar mil gaya, toh Auth User banao
-  const { data, error: signUpError } = await supabase.auth.signUp({
-    email: formData.email,
-    password: formData.password,
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    cnic: "",
+    password: "",
   });
 
-  if (signUpError) {
-    alert(signUpError.message);
-  } else {
-    alert("Signup Successful! Check your email.");
-  }
-  setLoading(false);
-};
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { data, error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
+          full_name: formData.fullName,
+          cnic: formData.cnic,
+        }
+      }
+    });
+
+    if (error) {
+      alert(error.message);
+      setLoading(false);
+    } else {
+      alert("Registration Successful! ");
+      navigate("/login");
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">SMIT Connect</h2>
-        <p className="text-center text-gray-600 mb-8">Create your student account</p>
+    <div style={{ 
+      fontFamily: "'Plus Jakarta Sans', sans-serif", 
+      background: "#f8fafc", 
+      minHeight: "100vh", 
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center",
+      padding: "15px"
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        input:focus { 
+          outline: none; 
+          border-color: #10b981 !important; 
+          box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); 
+        }
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-            {error}
+        .main-container {
+          display: flex;
+          flex-direction: row;
+          width: 100%;
+          max-width: 1000px;
+          background: #fff;
+          border-radius: 30px;
+          overflow: hidden;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        }
+
+        .left-panel {
+          flex: 1;
+          background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+          padding: 50px;
+          color: #fff;
+          display: flex;
+          flex-direction: column;
+          justifyContent: center;
+        }
+
+        .right-panel {
+          flex: 1;
+          padding: 50px;
+          background: #fff;
+        }
+
+        /* Responsive Mobile Styles */
+        @media (max-width: 850px) {
+          .main-container {
+            flex-direction: column;
+            border-radius: 20px;
+          }
+          .left-panel {
+            padding: 40px 30px;
+            text-align: center;
+            align-items: center;
+          }
+          .right-panel {
+            padding: 40px 25px;
+          }
+          .hero-title {
+            font-size: 32px !important;
+          }
+          .logo-img {
+            margin: 0 auto 20px auto !important;
+          }
+        }
+      `}</style>
+
+      <div className="main-container">
+        
+        {/* LEFT SIDE: Info */}
+        <div className="left-panel">
+          <img 
+            src="https://www.smit.ee/social-1200x630.png" 
+            width={100} 
+            className="logo-img"
+            style={{ filter: "brightness(0) invert(1)", marginBottom: 30, width: "fit-content" }} 
+            alt="SMIT" 
+          />
+          <h1 className="hero-title" style={{ fontSize: 40, fontWeight: 800, lineHeight: 1.2, marginBottom: 20 }}>
+            Start Your <br/> <span style={{ color: "#34d399" }}>Tech Journey</span> With Us.
+          </h1>
+          <p style={{ fontSize: 17, opacity: 0.9, lineHeight: 1.6 }}>
+            Join the largest free IT training program in Pakistan and upgrade your skills.
+          </p>
+        </div>
+
+        {/* RIGHT SIDE: Form */}
+        <div className="right-panel">
+          <div style={{ marginBottom: 30 }}>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: "#1e293b" }}>Create Account</h2>
+            <p style={{ color: "#64748b", marginTop: 5 }}>Join SMIT Batch 2025</p>
           </div>
-        )}
 
-        <form onSubmit={handleSignup} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
-            <input
-              type="text"
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 outline-blue-500"
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">CNIC</label>
-              <input
-                type="text"
-                placeholder="42101-XXXXXXX-X"
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: 15 }}>
+              <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#475569", marginBottom: 6 }}>Full Name</label>
+              <input 
+                type="text" 
+                name="fullName"
+                placeholder="Enter full name"
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 outline-blue-500"
-                onChange={(e) => setFormData({ ...formData, cnic: e.target.value })}
+                onChange={handleChange}
+                style={{ width: "100%", padding: "13px 16px", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: 15, background: "#f8fafc" }}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Roll Number</label>
-              <input
-                type="text"
+
+            <div style={{ marginBottom: 15 }}>
+              <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#475569", marginBottom: 6 }}>Email Address</label>
+              <input 
+                type="email" 
+                name="email"
+                placeholder="email@example.com"
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 outline-blue-500"
-                onChange={(e) => setFormData({ ...formData, rollNo: e.target.value })}
+                onChange={handleChange}
+                style={{ width: "100%", padding: "13px 16px", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: 15, background: "#f8fafc" }}
               />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email Address</label>
-            <input
-              type="email"
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 outline-blue-500"
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
+            <div style={{ marginBottom: 15 }}>
+              <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#475569", marginBottom: 6 }}>CNIC</label>
+              <input 
+                type="text" 
+                name="cnic"
+                placeholder="42101XXXXXXX"
+                required
+                onChange={handleChange}
+                style={{ width: "100%", padding: "13px 16px", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: 15, background: "#f8fafc" }}
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 outline-blue-500"
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            />
-          </div>
+            <div style={{ marginBottom: 25 }}>
+              <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#475569", marginBottom: 6 }}>Password</label>
+              <input 
+                type="password" 
+                name="password"
+                placeholder="••••••••"
+                required
+                onChange={handleChange}
+                style={{ width: "100%", padding: "13px 16px", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: 15, background: "#f8fafc" }}
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-              loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors`}
-          >
-            {loading ? 'Processing...' : 'Register Now'}
-          </button>
-        </form>
+            <button 
+              type="submit" 
+              disabled={loading}
+              style={{ 
+                width: "100%", 
+                padding: "15px", 
+                background: "#059669", 
+                color: "#fff", 
+                border: "none", 
+                borderRadius: "12px", 
+                fontSize: 16, 
+                fontWeight: 700, 
+                cursor: loading ? "not-allowed" : "pointer",
+                boxShadow: "0 10px 15px -3px rgba(5, 150, 105, 0.2)",
+                opacity: loading ? 0.8 : 1
+              }}
+            >
+              {loading ? "Creating Account..." : "Register Now"}
+            </button>
+          </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-            Sign in
-          </Link>
-        </p>
+          <p style={{ textAlign: "center", marginTop: 25, color: "#64748b", fontSize: 14 }}>
+            Already have an account? <Link to="/login" style={{ color: "#059669", fontWeight: 700, textDecoration: "none" }}>Log in</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Signup;
+}
