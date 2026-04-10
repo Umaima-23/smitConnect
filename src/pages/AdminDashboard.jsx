@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useNavigate } from 'react-router-dom';
+import smit from '../assets/smit.png'
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const AdminDashboard = () => {
     totalStudents: '0',
     activeCourses: '14',
     pendingLeaves: '0',
-    admins: '5',
+    admins: '1',
   });
 
   // --- Functions ---
@@ -70,36 +71,56 @@ const AdminDashboard = () => {
     fetchLeaves();
   }, []);
 
-  const handleCreateUser = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-      });
-      if (authError) throw authError;
-      const newUserId = authData?.user?.id;
-      const { error: dbError } = await supabase
-        .from('profiles')
-        .insert([{ 
-          id: newUserId, 
-          full_name: formData.fullName, 
-          email: formData.email, 
-          cnic: formData.cnic, 
-          rollNo: "SMIT-" + Math.floor(Math.random() * 1000),
-          role: 'student' 
-        }]);
-      if (dbError) throw dbError;
-      alert("Student added!");
-      fetchStudents();
-      setIsModalOpen(false);
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setLoading(false);
+const handleCreateUser = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  try {
+    // 1. Auth SignUp
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    // Agar user pehle se hai, toh error ko handle karein bajaye throw karne ke
+    if (authError) {
+      if (authError.message.includes("already registered")) {
+        alert("Ye email pehle se registered hai! Check karein profiles table mein.");
+        setLoading(false);
+        return; // List update nahi hogi kyunki naya banda add hi nahi hua
+      }
+      throw authError;
     }
-  };
+
+    const newUserId = authData?.user?.id;
+    if (!newUserId) throw new Error("User ID generate nahi hui.");
+
+    // 2. Profile Insert
+    const { error: dbError } = await supabase
+      .from('profiles')
+      .insert([{ 
+        id: newUserId, 
+        fullName: formData.fullName, 
+        email: formData.email, 
+        cnic: formData.cnic, 
+        rollNo: "SMIT-" + Math.floor(Math.random() * 1000),
+        role: 'student' 
+      }]);
+
+    if (dbError) throw dbError;
+
+    alert("Student added successfully!");
+    
+    // 3. Clear Form & Refresh List
+    setFormData({ fullName: "", email: "", password: "", cnic: "" });
+    fetchStudents(); // List refresh
+    setIsModalOpen(false);
+
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -116,7 +137,13 @@ const AdminDashboard = () => {
       {/* --- SIDEBAR --- */}
       <aside style={{ width: "260px", background: "#fff", borderRight: "1px solid #e2e8f0", padding: "30px", display: "flex", flexDirection: "column", position: "fixed", height: "100vh" }}>
         <div style={{ marginBottom: "40px" }}>
-          <img src="https://www.saylaniwelfare.com/static/media/logo_saylaniwelfare.22bf2096.png" height="45" alt="SMIT" />
+                 <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+          <div style={{ width: 42, height: 42, borderRadius: 12, background: "#10b981", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 20 }}>S</div>
+          <div style={{ color: "black" }}>
+            <div style={{ fontWeight: 800, fontSize: 17, lineHeight: 1.1 }}>SMIT Connect</div>
+            <div style={{ opacity: 0.6, fontSize: 9 }}>SAYLANI MASS IT TRAINING</div>
+          </div>
+        </div>
         </div>
 
         <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -192,7 +219,7 @@ const AdminDashboard = () => {
               <tbody>
                 {studentsList.map((st) => (
                   <tr key={st.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                    <td style={{ padding: "15px", fontWeight: "600" }}>{st.full_name}</td>
+                    <td style={{ padding: "15px", fontWeight: "600" }}>{st.fullName}</td>
                     <td style={{ padding: "15px" }}>{st.email}</td>
                     <td style={{ padding: "15px" }}>{st.cnic || "---"}</td>
                   </tr>

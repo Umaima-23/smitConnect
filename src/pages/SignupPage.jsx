@@ -42,12 +42,12 @@ export default function SignupPage() {
   };
 
   return (
-    <div style={{ 
-      fontFamily: "'Plus Jakarta Sans', sans-serif", 
-      background: "#f8fafc", 
-      minHeight: "100vh", 
-      display: "flex", 
-      alignItems: "center", 
+    <div style={{
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      background: "#f8fafc",
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
       justifyContent: "center",
       padding: "15px"
     }}>
@@ -110,19 +110,14 @@ export default function SignupPage() {
         }
       `}</style>
 
-      <div className="main-container">
-        
+      <div className="main-container ">
+
         {/* LEFT SIDE: Info */}
-        <div className="left-panel">
-          <img 
-            src="https://www.smit.ee/social-1200x630.png" 
-            width={100} 
-            className="logo-img"
-            style={{ filter: "brightness(0) invert(1)", marginBottom: 30, width: "fit-content" }} 
-            alt="SMIT" 
-          />
+        <div className="left-panel flex justify-center flex-col order-2F">
+          <div style={{ width: 42, height: 42, borderRadius: 12, background: "#10b981", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 20 }}>S</div>
+
           <h1 className="hero-title" style={{ fontSize: 40, fontWeight: 800, lineHeight: 1.2, marginBottom: 20 }}>
-            Start Your <br/> <span style={{ color: "#34d399" }}>Tech Journey</span> With Us.
+            Start Your <br /> <span style={{ color: "#34d399" }}>Tech Journey</span> With Us.
           </h1>
           <p style={{ fontSize: 17, opacity: 0.9, lineHeight: 1.6 }}>
             Join the largest free IT training program in Pakistan and upgrade your skills.
@@ -139,8 +134,8 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 15 }}>
               <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#475569", marginBottom: 6 }}>Full Name</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="fullName"
                 placeholder="Enter full name"
                 required
@@ -151,8 +146,8 @@ export default function SignupPage() {
 
             <div style={{ marginBottom: 15 }}>
               <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#475569", marginBottom: 6 }}>Email Address</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 name="email"
                 placeholder="email@example.com"
                 required
@@ -163,8 +158,8 @@ export default function SignupPage() {
 
             <div style={{ marginBottom: 15 }}>
               <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#475569", marginBottom: 6 }}>CNIC</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="cnic"
                 placeholder="42101XXXXXXX"
                 required
@@ -175,8 +170,8 @@ export default function SignupPage() {
 
             <div style={{ marginBottom: 25 }}>
               <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#475569", marginBottom: 6 }}>Password</label>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 name="password"
                 placeholder="••••••••"
                 required
@@ -185,18 +180,18 @@ export default function SignupPage() {
               />
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
-              style={{ 
-                width: "100%", 
-                padding: "15px", 
-                background: "#059669", 
-                color: "#fff", 
-                border: "none", 
-                borderRadius: "12px", 
-                fontSize: 16, 
-                fontWeight: 700, 
+              style={{
+                width: "100%",
+                padding: "15px",
+                background: "#059669",
+                color: "#fff",
+                border: "none",
+                borderRadius: "12px",
+                fontSize: 16,
+                fontWeight: 700,
                 cursor: loading ? "not-allowed" : "pointer",
                 boxShadow: "0 10px 15px -3px rgba(5, 150, 105, 0.2)",
                 opacity: loading ? 0.8 : 1
